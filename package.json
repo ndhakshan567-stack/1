@@ -1,0 +1,25 @@
+{
+  "name": "discord-bot",
+  "version": "2.0.0",
+  "description": "Feature-rich Discord bot with economy, tier lists, moderation, and more",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "deploy-commands": "node src/deploy-commands.js",
+    "deploy-and-start": "node src/deploy-commands.js && node src/index.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.16.3",
+    "axios": "^1.7.7",
+    "dotenv": "^16.4.5",
+    "cors": "^2.8.5",
+    "node-cron": "^3.0.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
