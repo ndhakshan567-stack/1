@@ -1,4 +1,4 @@
-const { DatabaseSync } = require('node:sqlite');
+const Database = require('better-sqlite3');
 const path = require('path');
 const fs = require('fs');
 
@@ -7,7 +7,7 @@ const dataDir = path.dirname(dbPath);
 
 if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
 
-const db = new DatabaseSync(dbPath);
+const db = new Database(dbPath);
 
 db.exec(`
   CREATE TABLE IF NOT EXISTS guild_settings (
