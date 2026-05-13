@@ -53,11 +53,53 @@ module.exports = {
       const reason = interaction.options.getString('reason');
       db.prepare('INSERT INTO warnings (user_id, guild_id, moderator_id, reason, timestamp) VALUES (?, ?, ?, ?, ?)').run(user.id, interaction.guild.id, interaction.user.id, reason, Date.now());
       const count = db.prepare('SELECT COUNT(*) as c FROM warnings WHERE user_id = ? AND guild_id = ?').get(user.id, interaction.guild.id);
-      const embed = new EmbedBuilder().setColor('#ffaa00').setTitle('⚠️ User Warned')
-        .addFields({ name: 'User', value: `${user.tag}`, inline: true }, { name: 'Moderator', value: `${interaction.user.tag}`, inline: true }, { name: 'Reason', value: reason }, { name: 'Total Warnings', value: String(count.c) })
+
+      // Public/log embed
+      const logEmbed = new EmbedBuilder()
+        .setColor('#ff0000')
+        .setTitle('⚠️ User Warned')
+        .setThumbnail(user.displayAvatarURL({ dynamic: true }))
+        .addFields(
+          { name: '👤 User', value: `${user.tag} (<@${user.id}>)`, inline: true },
+          { name: '🛡️ Moderator', value: `${interaction.user.tag}`, inline: true },
+          { name: '📋 Reason', value: reason },
+          { name: '🔢 Total Warnings', value: String(count.c), inline: true },
+          { name: '🏠 Server', value: interaction.guild.name, inline: true }
+        )
+        .setFooter({ text: `Warning issued in ${interaction.guild.name}` })
         .setTimestamp();
-      sendLog(embed);
-      await interaction.reply({ embeds: [embed] });
+
+      // DM embed — red sapphire style
+      const dmEmbed = new EmbedBuilder()
+        .setColor('#8B0000')
+        .setTitle('🔴 You Have Received a Warning')
+        .setDescription(
+          `> You have been **officially warned** in **${interaction.guild.name}**.\n` +
+          `> Please review the server rules to avoid further action.`
+        )
+        .setThumbnail(interaction.guild.iconURL({ dynamic: true }))
+        .addFields(
+          { name: '📋 Reason', value: `\`\`\`${reason}\`\`\`` },
+          { name: '🛡️ Issued By', value: interaction.user.tag, inline: true },
+          { name: '🔢 Warning #', value: String(count.c), inline: true },
+          { name: '🏠 Server', value: interaction.guild.name, inline: true },
+          {
+            name: '⚠️ Notice',
+            value: 'Continued violations may result in a mute, kick, or ban.\nIf you believe this warning was issued in error, please contact a moderator.'
+          }
+        )
+        .setFooter({ text: '💎 Moderation System', iconURL: interaction.guild.iconURL({ dynamic: true }) })
+        .setTimestamp();
+
+      // Attempt to DM the warned user
+      try {
+        await user.send({ embeds: [dmEmbed] });
+      } catch (_) {
+        // User has DMs closed — silently skip
+      }
+
+      sendLog(logEmbed);
+      await interaction.reply({ embeds: [logEmbed] });
     }
 
     else if (sub === 'kick') {

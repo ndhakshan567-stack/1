@@ -92,9 +92,13 @@ module.exports = {
           const embed = new EmbedBuilder()
             .setColor('#FFD700')
             .setTitle('🎉 Level Up!')
-            .setDescription(`${message.author} just leveled up to **Level ${newLevel}**! 🎊`)
+            .setDescription(
+              `🎊 Congratulations ${message.author} you reached **Level ${newLevel}**!\n\n` +
+              `Now **VOIDMASTER8399** and **PokeFanIconZ** are proud of you!`
+            )
             .setThumbnail(message.author.displayAvatarURL({ dynamic: true }))
             .setImage(gif)
+            .setFooter({ text: `Keep chatting to reach the next level!` })
             .setTimestamp();
           lvlCh.send({ content: `${message.author}`, embeds: [embed] }).catch(() => {});
         }
